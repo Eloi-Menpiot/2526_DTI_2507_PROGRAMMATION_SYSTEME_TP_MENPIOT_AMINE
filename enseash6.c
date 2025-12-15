@@ -8,8 +8,8 @@
 #include <time.h>
 
 #define BUFSIZE 128
-#define EXIT_QUERY "exit"
 #define CHILD 0
+#define EXIT_QUERY "exit"
 
 
 int main(void){
@@ -20,6 +20,7 @@ int main(void){
 		read(STDIN_FILENO, input, BUFSIZE);
 
 		char* token = strtok(input," \n");
+		char* args[BUFSIZE];
 		if (token != NULL) {
 			if (strncmp(token, EXIT_QUERY, BUFSIZE) == 0) {
 				strncpy(buffer, "A bientôt !\n", BUFSIZE);
@@ -27,33 +28,32 @@ int main(void){
 				return EXIT_SUCCESS;
 			}
 
-
+			int index = 0;
+			while (token != NULL) {
+				args[index]=token;
+				token = strtok(NULL, " \n");
+				index++;
+			}
 
 			struct timespec timer_start;
 			struct timespec timer_end;
 			clock_gettime(CLOCK_REALTIME, &timer_start);
-
 			int pid, status;
-			if ((pid = fork()) != CHILD) { // Création de l'enfant
+			if ((pid = fork()) != 0) {
 				wait(&status);
 				clock_gettime(CLOCK_REALTIME, &timer_end);
-                int delay = timer_end.tv_sec*1e3 - timer_start.tv_sec*1e3 + timer_end.tv_nsec*1e-6 - timer_start.tv_nsec*1e-6;
+				int delay = timer_end.tv_sec*1e3 - timer_start.tv_sec*1e3 + timer_end.tv_nsec*1e-6 - timer_start.tv_nsec*1e-6;
 
-				if (WIFEXITED(status)) {  // If child stops normally
-					snprintf(buffer, BUFSIZE,"\nenseash [exit : %d|%dms] %%", WEXITSTATUS(status), delay);
-				}
-                
-                else if (WIFSIGNALED(status)) { // If signal stops child
-					snprintf(buffer, BUFSIZE,"\nenseash [sign : %d] %%", WTERMSIG(status), delay);
+				if (WIFEXITED(status)) {
+					snprintf(buffer, BUFSIZE,"\nenseash [exit : %d|%dms] %% ", WEXITSTATUS(status), delay);
+				}else if (WIFSIGNALED(status)) {
+					snprintf(buffer, BUFSIZE,"\nenseash [sign : %d|%dms] %% ", WTERMSIG(status), delay);
 				}
 
 				write(STDOUT_FILENO, buffer, strnlen(buffer,BUFSIZE));
-
-			}
-            
-            else { 
-				execlp(token, token, (char*)NULL);
-				sprintf(buffer, "Error while running %s",token);
+			}else {
+				execvp(args[0], args);
+				sprintf(buffer, "Error while running %s\n",args[0]);
 				write(STDERR_FILENO, buffer, strnlen(buffer,BUFSIZE));
 				exit(EXIT_FAILURE);
 			}
