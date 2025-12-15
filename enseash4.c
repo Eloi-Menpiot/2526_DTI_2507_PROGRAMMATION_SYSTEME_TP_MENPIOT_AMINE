@@ -8,6 +8,7 @@
 #include <time.h>
 
 #define BUFSIZE 128
+#define CHILD 0
 
 
 int main(void){
@@ -26,17 +27,17 @@ int main(void){
 			}
 
 			int pid, status;
-			if ((pid = fork()) != 0) {
+			if ((pid = fork()) != CHILD) { //
 				wait(&status);
 
-				if (WIFEXITED(status)) {
+				if (WIFEXITED(status)) {  // If child stops
 					snprintf(buffer, BUFSIZE,"\nenseash [exit : %d] %%", WEXITSTATUS(status));
-				}else if (WIFSIGNALED(status)) {
+				}else if (WIFSIGNALED(status)) { // If signal stops child
 					snprintf(buffer, BUFSIZE,"\nenseash [sign : %d] %%", WTERMSIG(status));
 				}
 
 				write(STDOUT_FILENO, buffer, strnlen(buffer,BUFSIZE));
-			}else {
+			}else { 
 				execlp(token, token, (char*)NULL);
 				sprintf(buffer, "Error while running %s",token);
 				write(STDERR_FILENO, buffer, strnlen(buffer,BUFSIZE));
