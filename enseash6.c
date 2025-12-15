@@ -27,6 +27,8 @@ int main(void){
 				return EXIT_SUCCESS;
 			}
 
+
+
 			struct timespec timer_start;
 			struct timespec timer_end;
 			clock_gettime(CLOCK_REALTIME, &timer_start);

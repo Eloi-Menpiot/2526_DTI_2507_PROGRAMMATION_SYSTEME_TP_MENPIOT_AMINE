@@ -9,6 +9,7 @@
 
 #define BUFSIZE 128
 #define CHILD 0
+#define EXIT_QUERY "exit"
 
 
 int main(void){
@@ -20,7 +21,7 @@ int main(void){
 
 		char* token = strtok(input," \n");
 		if (token != NULL) {
-			if (strncmp(token, "exit", BUFSIZE) == 0) {
+			if (strncmp(token, EXIT_QUERY, BUFSIZE) == 0) {
 				strncpy(buffer, "A bientôt !\n", BUFSIZE);
 				write(STDOUT_FILENO, buffer, strnlen(buffer,BUFSIZE));
 				return EXIT_SUCCESS;

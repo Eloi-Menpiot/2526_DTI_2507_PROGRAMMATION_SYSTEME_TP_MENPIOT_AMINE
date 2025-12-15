@@ -6,6 +6,8 @@
 #include <sys/types.h>
 
 #define MAX_LEN 1024
+#define CHILD 0
+#define EXIT_QUERY "exit"
 
 int main(int argv, char **argc){
 	char* buffer;
@@ -24,7 +26,7 @@ int main(int argv, char **argc){
 		char * token = strtok(input, " \n");
 		if (token != NULL){
 
-			if(strncmp(token, "exit", MAX_LEN) == 0){
+			if(strncmp(token, EXIT_QUERY, MAX_LEN) == 0){
 				buffer = "A bientôt !\n";
 				write(STDOUT_FILENO, buffer, strnlen(buffer, MAX_LEN));
 				return EXIT_SUCCESS;
